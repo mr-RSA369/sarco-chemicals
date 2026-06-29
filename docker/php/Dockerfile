@@ -83,6 +83,10 @@ RUN php artisan package:discover --ansi
 
 COPY --from=node /app/public/build ./public/build
 
+RUN mkdir -p /var/www-public-template
+
+RUN cp -a public/. /var/www-public-template/
+
 COPY docker/php/php.ini \
     /usr/local/etc/php/conf.d/custom.ini
 
@@ -95,5 +99,11 @@ RUN chmod -R 775 \
     bootstrap/cache
 
 EXPOSE 9000
+
+COPY docker/php/entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["php-fpm"]

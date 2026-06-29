@@ -16,6 +16,7 @@ services:
 
     volumes:
     - ./.env:/var/www/.env
+    - laravel-public:/var/www/public
 
     networks:
       - sarco
@@ -46,7 +47,7 @@ services:
         condition: service_healthy
 
     volumes:
-      - ./:/var/www:ro
+        - laravel-public:/var/www/public:ro
 
     networks:
       - sarco
@@ -72,6 +73,8 @@ services:
 
 
 volumes:
+
+  laravel-public:
 
   redis-data:
 
