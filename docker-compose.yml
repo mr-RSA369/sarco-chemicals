@@ -1,0 +1,82 @@
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+
+    image: sarco-chemicals:latest
+
+    container_name: sarco-app
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    volumes:
+    - ./.env:/var/www/.env
+
+    networks:
+      - sarco
+
+    healthcheck:
+      test: ["CMD", "php", "-v"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+
+
+  nginx:
+
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+
+    container_name: sarco-nginx
+
+    restart: unless-stopped
+
+    ports:
+      - "80:80"
+
+    depends_on:
+      app:
+        condition: service_healthy
+
+    volumes:
+      - ./:/var/www:ro
+
+    networks:
+      - sarco
+
+
+
+  redis:
+
+    image: redis:7-alpine
+
+    container_name: sarco-redis
+
+    restart: unless-stopped
+
+    command: redis-server --appendonly yes
+
+    volumes:
+      - redis-data:/data
+
+    networks:
+      - sarco
+
+
+
+volumes:
+
+  redis-data:
+
+
+
+networks:
+
+  sarco:
